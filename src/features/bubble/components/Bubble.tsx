@@ -17,8 +17,8 @@ export const Bubble = (props: BubbleProps) => {
   const [isBotOpened, setIsBotOpened] = createSignal(false);
   const [isBotStarted, setIsBotStarted] = createSignal(false);
   const [buttonPosition, setButtonPosition] = createSignal({
-    bottom: bubbleProps.theme?.button?.bottom ?? 20,
-    right: bubbleProps.theme?.button?.right ?? 20,
+    left: bubbleProps.theme?.defaultPosition?.left ?? 20,
+    bottom: bubbleProps.theme?.defaultPosition?.bottom ?? 20,
   });
 
   const openBot = () => {
@@ -73,13 +73,13 @@ export const Bubble = (props: BubbleProps) => {
       />
       <BubbleButton
         {...bubbleProps.theme?.button}
-        toggleBot={toggleBot}
         isBotOpened={isBotOpened()}
+        toggleBot={toggleBot}
         setButtonPosition={setButtonPosition}
-        dragAndDrop={bubbleProps.theme?.button?.dragAndDrop ?? false}
-        autoOpen={bubbleProps.theme?.button?.autoWindowOpen?.autoOpen ?? false}
-        openDelay={bubbleProps.theme?.button?.autoWindowOpen?.openDelay}
-        autoOpenOnMobile={bubbleProps.theme?.button?.autoWindowOpen?.autoOpenOnMobile ?? false}
+        dragAndDrop={bubbleProps.theme?.button?.dragAndDrop}
+        autoOpen={bubbleProps.theme?.button?.autoWindowOpen?.autoOpen ? { enabled: true, clickedOnce: false } : undefined}
+        openDelay={bubbleProps.theme?.button?.autoWindowOpen?.delay}
+        autoOpenOnMobile={bubbleProps.theme?.button?.autoWindowOpen?.autoOpenOnMobile}
       />
       <div
         part="bot"
@@ -87,7 +87,7 @@ export const Bubble = (props: BubbleProps) => {
           height: bubbleProps.theme?.chatWindow?.height ? `${bubbleProps.theme?.chatWindow?.height.toString()}px` : 'calc(100% - 150px)',
           width: bubbleProps.theme?.chatWindow?.width ? `${bubbleProps.theme?.chatWindow?.width.toString()}px` : undefined,
           transition: 'transform 200ms cubic-bezier(0, 1.2, 1, 1), opacity 150ms ease-out',
-          'transform-origin': 'bottom right',
+          'transform-origin': 'bottom left',
           transform: isBotOpened() ? 'scale3d(1, 1, 1)' : 'scale3d(0, 0, 1)',
           'box-shadow': 'rgb(0 0 0 / 16%) 0px 5px 40px',
           'background-color': bubbleProps.theme?.chatWindow?.backgroundColor || '#ffffff',
@@ -97,10 +97,10 @@ export const Bubble = (props: BubbleProps) => {
           'background-repeat': 'no-repeat',
           'z-index': 42424242,
           bottom: `${Math.min(buttonPosition().bottom + buttonSize + 10, window.innerHeight - chatWindowBottom)}px`,
-          right: `${Math.max(0, Math.min(buttonPosition().right, window.innerWidth - (bubbleProps.theme?.chatWindow?.width ?? 410) - 10))}px`,
+          left: `${Math.max(0, Math.min(buttonPosition().left, window.innerWidth - (bubbleProps.theme?.chatWindow?.width ?? 410) - 10))}px`,
         }}
         class={
-          `fixed sm:right-5 rounded-lg w-full sm:w-[400px] max-h-[704px]` +
+          `fixed sm:left-5 rounded-lg w-full sm:w-[400px] max-h-[704px]` +
           (isBotOpened() ? ' opacity-1' : ' opacity-0 pointer-events-none') +
           ` bottom-${chatWindowBottom}px`
         }

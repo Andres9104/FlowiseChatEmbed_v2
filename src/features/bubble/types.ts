@@ -8,6 +8,10 @@ export type BubbleTheme = {
   tooltip?: ToolTipTheme;
   disclaimer?: DisclaimerPopUpTheme;
   customCSS?: string;
+  defaultPosition?: {
+    left?: number;
+    bottom?: number;
+  };
 };
 
 export type TextInputTheme = {
@@ -83,8 +87,8 @@ export type ButtonTheme = {
   backgroundColor?: string;
   iconColor?: string;
   customIconSrc?: string;
+  left?: number;
   bottom?: number;
-  right?: number;
   dragAndDrop?: boolean; // parameter to enable drag and drop(true or false)
   autoWindowOpen?: autoWindowOpenTheme;
 };
@@ -98,9 +102,9 @@ export type ToolTipTheme = {
 };
 
 export type autoWindowOpenTheme = {
-  autoOpen?: boolean; //parameter to control automatic window opening
-  openDelay?: number; // Optional parameter for delay time in seconds
-  autoOpenOnMobile?: boolean; // Optional parameter for opening on mobile
+  autoOpen?: boolean;
+  delay?: number;
+  autoOpenOnMobile?: boolean;
 };
 
 export type DisclaimerPopUpTheme = {

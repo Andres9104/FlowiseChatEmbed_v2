@@ -6,8 +6,11 @@ type Props = ButtonTheme & {
         bottom: number;
         right: number;
     }) => void;
-    dragAndDrop: boolean;
-    autoOpen?: boolean;
+    dragAndDrop?: boolean;
+    autoOpen?: {
+        enabled: boolean;
+        clickedOnce: boolean;
+    };
     openDelay?: number;
     autoOpenOnMobile?: boolean;
 };

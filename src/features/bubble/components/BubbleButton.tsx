@@ -1,4 +1,4 @@
-import { createSignal, createEffect, Show } from 'solid-js';
+import { createSignal, createEffect, onMount, onCleanup, Show } from 'solid-js';
 import { isNotDefined, getBubbleButtonSize } from '@/utils/index';
 import { ButtonTheme } from '../types';
 
@@ -6,77 +6,53 @@ type Props = ButtonTheme & {
   isBotOpened: boolean;
   toggleBot: () => void;
   setButtonPosition: (position: { bottom: number; right: number }) => void;
-  dragAndDrop: boolean;
-  autoOpen?: boolean; // Optional parameter to control automatic window opening
-  openDelay?: number; // Optional parameter for delay time in seconds
-  autoOpenOnMobile?: boolean; // Optional parameter for opening on mobile
+  dragAndDrop?: boolean;
+  autoOpen?: { enabled: boolean; clickedOnce: boolean };
+  openDelay?: number;
+  autoOpenOnMobile?: boolean;
 };
 
-const defaultButtonColor = '#3B81F6';
+const defaultButtonColor = '#FF8C00';  // Naranja (DarkOrange)
 const defaultIconColor = 'white';
+const defaultLeft = 20;
 const defaultBottom = 20;
-const defaultRight = 20;
 
 export const BubbleButton = (props: Props) => {
   const buttonSize = getBubbleButtonSize(props.size);
 
   const [position, setPosition] = createSignal({
+    left: props.left ?? defaultLeft,
     bottom: props.bottom ?? defaultBottom,
-    right: props.right ?? defaultRight,
   });
 
   const [isSmallScreen, setIsSmallScreen] = createSignal(false);
-  const [userInteracted, setUserInteracted] = createSignal(false);
 
-  let dragStartX: number;
-  let initialRight: number;
-
-  const onMouseDown = (e: MouseEvent) => {
-    if (props.dragAndDrop) {
-      dragStartX = e.clientX;
-      initialRight = position().right;
-
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    }
-  };
-
-  const onMouseMove = (e: MouseEvent) => {
-    const deltaX = dragStartX - e.clientX;
-    const newRight = initialRight + deltaX;
-
-    const screenWidth = window.innerWidth;
-    const maxRight = screenWidth - buttonSize;
-
-    const newPosition = {
-      right: Math.min(Math.max(newRight, defaultRight), maxRight),
-      bottom: position().bottom,
+  onMount(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 640);
     };
 
-    setPosition(newPosition);
-    props.setButtonPosition(newPosition);
-  };
+    window.addEventListener('resize', handleResize);
+    handleResize();
 
-  const onMouseUp = () => {
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
-  };
+    onCleanup(() => {
+      window.removeEventListener('resize', handleResize);
+    });
+  });
 
   const handleButtonClick = () => {
-    props.toggleBot();
-    setUserInteracted(true); // Mark that the user has interacted
-    if (window.innerWidth <= 640) {
-      setIsSmallScreen(true);
+    if (props.autoOpen?.enabled && !props.autoOpen?.clickedOnce) {
+      props.autoOpen.clickedOnce = true;
     }
+    props.toggleBot();
   };
 
   createEffect(() => {
-    // Automatically open the chat window if autoOpen is true
-    if (props.autoOpen && (props.autoOpenOnMobile || window.innerWidth > 640)) {
-      const delayInSeconds = props.openDelay ?? 2; // Default to 2 seconds if openDelay is not defined
-      const delayInMilliseconds = delayInSeconds * 1000; // Convert seconds to milliseconds
+    if (props.autoOpen?.enabled && (props.autoOpenOnMobile || window.innerWidth > 640)) {
+      const delayInSeconds = props.openDelay ?? 2;
+      const delayInMilliseconds = delayInSeconds * 1000;
       setTimeout(() => {
-        if (!props.isBotOpened && !userInteracted()) {
+        if (!props.isBotOpened && props.autoOpen?.enabled && !props.autoOpen?.clickedOnce) {
           props.toggleBot();
         }
       }, delayInMilliseconds);
@@ -88,16 +64,16 @@ export const BubbleButton = (props: Props) => {
       <button
         part="button"
         onClick={handleButtonClick}
-        onMouseDown={onMouseDown}
         class={`fixed shadow-md rounded-full hover:scale-110 active:scale-95 transition-transform duration-200 flex justify-center items-center animate-fade-in`}
         style={{
+          position: 'fixed',
           'background-color': props.backgroundColor ?? defaultButtonColor,
           'z-index': 42424242,
-          right: `${position().right}px`,
+          left: `${position().left}px`,
           bottom: `${position().bottom}px`,
           width: `${buttonSize}px`,
           height: `${buttonSize}px`,
-          cursor: props.dragAndDrop ? 'grab' : 'pointer',
+          cursor: 'pointer',
         }}
       >
         <Show when={isNotDefined(props.customIconSrc)} keyed>

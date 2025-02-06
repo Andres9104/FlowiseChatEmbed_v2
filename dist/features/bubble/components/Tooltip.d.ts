@@ -2,7 +2,7 @@ type TooltipProps = {
     showTooltip: boolean;
     position: {
         bottom: number;
-        right: number;
+        left: number;
     };
     buttonSize: number;
     tooltipMessage?: string;
