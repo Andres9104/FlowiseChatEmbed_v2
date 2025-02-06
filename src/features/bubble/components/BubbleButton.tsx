@@ -12,7 +12,7 @@ type Props = ButtonTheme & {
   autoOpenOnMobile?: boolean;
 };
 
-const defaultButtonColor = '#FF8C00';  // Naranja (DarkOrange)
+const defaultButtonColor = '#FF8C00'; // Naranja (DarkOrange)
 const defaultIconColor = 'white';
 const defaultLeft = 20;
 const defaultBottom = 20;
